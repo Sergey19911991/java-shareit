@@ -1,11 +1,9 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
+
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -23,22 +21,22 @@ public class UserController {
     }
 
     @PatchMapping(value = "/{userId}")
-    public User updateUser(@RequestBody User user,@PathVariable ("userId") int id){
-        return userService.updateUser(user,id);
+    public User updateUser(@RequestBody User user, @PathVariable("userId") int id) {
+        return userService.updateUser(user, id);
     }
 
     @GetMapping(value = "/{userId}")
-    public User getUser (@PathVariable ("userId") int id){
+    public User getUser(@PathVariable("userId") int id) {
         return userService.getUser(id);
     }
 
     @DeleteMapping(value = "/{userId}")
-    public void deleteUser(@PathVariable ("userId") int id){
+    public void deleteUser(@PathVariable("userId") int id) {
         userService.deleteUser(id);
     }
 
     @GetMapping
-    public List<User> getAllUser (){
+    public List<User> getAllUser() {
         return userService.getAllUser();
     }
 }
