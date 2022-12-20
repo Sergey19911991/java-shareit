@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
@@ -26,17 +27,17 @@ public class ItemController {
     }
 
     @GetMapping(value = "/{itemId}")
-    public Item getItemById(@PathVariable("itemId") int id, @RequestHeader("X-Sharer-User-Id") int idUser) {
+    public ItemDto getItemById(@PathVariable("itemId") int id, @RequestHeader("X-Sharer-User-Id") int idUser) {
         return itemService.getItemById(id, idUser);
     }
 
     @GetMapping
-    public List<Item> getItemAll(@RequestHeader("X-Sharer-User-Id") int idUser) {
+    public List<ItemDto> getItemAll(@RequestHeader("X-Sharer-User-Id") int idUser) {
         return itemService.getItemAll(idUser);
     }
 
     @GetMapping(value = "/search")
-    public List<Item> getSearch(@RequestParam String text, @RequestHeader("X-Sharer-User-Id") int idUser) {
+    public List<ItemDto> getSearch(@RequestParam String text, @RequestHeader("X-Sharer-User-Id") int idUser) {
         return itemService.getSearch(text, idUser);
     }
 }

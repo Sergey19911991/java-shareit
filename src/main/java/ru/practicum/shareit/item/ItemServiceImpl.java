@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
@@ -23,17 +24,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item getItemById(int id, int idUser) {
+    public ItemDto getItemById(int id, int idUser) {
         return itemRepository.getItemById(id, idUser);
     }
 
     @Override
-    public List<Item> getItemAll(int idUser) {
+    public List<ItemDto> getItemAll(int idUser) {
         return itemRepository.getItemAll(idUser);
     }
 
     @Override
-    public List<Item> getSearch(String text, int idUser) {
+    public List<ItemDto> getSearch(String text, int idUser) {
         return itemRepository.getSearch(text, idUser);
     }
 }

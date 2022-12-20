@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exeption.NotFoundException;
 import ru.practicum.shareit.exeption.RequestException;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.MappingItem;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -19,12 +21,15 @@ public class ItemRepository {
     private static final Map<Integer, Item> items = new HashMap<>();
     private final UserRepository userRepository;
 
+    private final MappingItem mappingItem;
+
 
     private int number = 1;
 
     @Autowired
-    public ItemRepository(UserRepository userRepository) {
+    public ItemRepository(UserRepository userRepository, MappingItem mappingItem) {
         this.userRepository = userRepository;
+        this.mappingItem = mappingItem;
     }
 
 
@@ -59,29 +64,29 @@ public class ItemRepository {
         }
     }
 
-    public Item getItemById(int id, int idUser) {
+    public ItemDto getItemById(int id, int idUser) {
         log.error("Выведена информация о вещи с id = {}", id);
-        return items.get(id);
+        return mappingItem.mapItemDto(items.get(id));
     }
 
-    public List<Item> getItemAll(int idUser) {
+    public List<ItemDto> getItemAll(int idUser) {
         log.error("Выведена информация о вещи пользователя с id = {}", idUser);
-        List<Item> itemsList = new ArrayList<>();
+        List<ItemDto> itemsList = new ArrayList<>();
         for (Item itemId : items.values()) {
             if (itemId.getOwner() == idUser) {
-                itemsList.add(itemId);
+                itemsList.add(mappingItem.mapItemDto(itemId));
             }
         }
         return itemsList;
     }
 
-    public List<Item> getSearch(String text, int idUser) {
+    public List<ItemDto> getSearch(String text, int idUser) {
         log.error("Выведена информация о вещях, содержащи в названии и/или в пописании текст {}", text);
-        List<Item> itemsList = new ArrayList<>();
+        List<ItemDto> itemsList = new ArrayList<>();
         if (!text.isEmpty()) {
             for (Item itemId : items.values()) {
                 if ((itemId.getName().toLowerCase().contains(text.toLowerCase()) || itemId.getDescription().toLowerCase().contains(text.toLowerCase())) && itemId.getAvailable() == true) {
-                    itemsList.add(itemId);
+                    itemsList.add(mappingItem.mapItemDto(itemId));
                 }
             }
         }
