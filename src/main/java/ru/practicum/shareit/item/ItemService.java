@@ -16,5 +16,5 @@ public interface ItemService {
 
     List<ItemDto> getItemAll(int idUser);
 
-    List<ItemDto> getSearch(String text, int idUser);
+    List<ItemDto> getSearch(String text,int idUser);
 }

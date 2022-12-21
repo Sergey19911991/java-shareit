@@ -25,11 +25,11 @@ public class UserRepository {
     }
 
     public User updateUser(User user, int id) {
-        if (!(user.getEmail() == null)) {
+        if (user.getEmail() != null) {
             validationUserEmail(user);
             users.get(id).setEmail(user.getEmail());
         }
-        if (!(user.getName() == null)) {
+        if (user.getName() != null) {
             users.get(id).setName(user.getName());
         }
         log.info("Изменены данные пользователя с id = {}", id);
@@ -49,9 +49,7 @@ public class UserRepository {
     public List<User> getAllUser() {
         log.info("Выведены данные о всех пользователях");
         List<User> usersList = new ArrayList<>();
-        for (User userId : users.values()) {
-            usersList.add(userId);
-        }
+        usersList.addAll(users.values());
         return usersList;
     }
 
