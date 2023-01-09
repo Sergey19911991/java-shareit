@@ -13,7 +13,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleValidationException(final ValidationExeption e) {
-        return Map.of("error", "Ошибка",
+        return Map.of("error", e.getMessage(),
                 "errorMessage", e.getMessage()
         );
     }

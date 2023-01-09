@@ -1,15 +1,23 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.*;
 
-@Slf4j
+@Entity
+@Table(name = "items")
 @Data
 public class Item {
-     private int id;
-     private String name;
-     private String description;
-     private Boolean available;
-     private int owner;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "description")
+    private String description;
+    @Column(name = "available")
+    private Boolean available;
+    @Column(name = "owner")
+    private int owner;
 }
