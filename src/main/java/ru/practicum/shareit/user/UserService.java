@@ -59,7 +59,13 @@ public class UserService {
 
 
     public void deleteUser(int id) {
-        userRepositoryJpa.deleteById(id);
+        if (userRepositoryJpa.existsById(id)) {
+            log.info("Удален пользователь с id = {}",id);
+            userRepositoryJpa.deleteById(id);
+        } else {
+            log.error("Пользователь с таким id не найден");
+            throw new NotFoundException("Пользователь с таким id не найден");
+        }
     }
 
     public List<User> getAllUser() {

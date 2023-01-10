@@ -49,6 +49,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking updateBookingApp(int bookingId, int booker) {
+        if (bookingsRepository.findById(bookingId).get().getStatus() == Booking.Status.APPROVED) {
+            throw new RequestException("Данный запрос на бронирование уже подтвержден");
+        }
         if (bookingsRepository.findById(bookingId).get().item.getOwner() == booker) {
             Booking booking = bookingsRepository.findById(bookingId).get();
             booking.setStatus(Booking.Status.APPROVED);
@@ -75,31 +78,82 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking getBooking(int bookingId, int bookerId) {
-        if (bookingsRepository.existsById(bookingId) && userRepositoryJpa.existsById(bookerId) && (bookingsRepository.findById(bookingId).get().booker.getId() == bookerId || bookingsRepository.findById(bookingId).get().item.getOwner() == bookerId)) {
+        Booking booking = bookingsRepository.findById(bookingId).orElse(null);
+        ;
+        if (booking != null && userRepositoryJpa.existsById(bookerId) && (booking.booker.getId() == bookerId || booking.item.getOwner() == bookerId)) {
             log.info("Данные о бронировании с id = {}", bookingId);
             return bookingsRepository.getBooking(bookingId, bookerId);
         } else {
-            log.error("Такого бронирования не существует и/или такого пользователя не существует и/или пользователь не является хозяином вещи и/или пользователь не забронировал данную вещь");
-            throw new NotFoundException("Такого бронирования не существует и/или такого пользователя не существует и/или пользователь не является хозяином вещи и/или пользователь не забронировал данную вещь");
+            log.error("Такого пользователя не существует и/или пользователь не является хозяином вещи и/или пользователь не забронировал данную вещь");
+            throw new NotFoundException("Такого пользователя не существует и/или пользователь не является хозяином вещи и/или пользователь не забронировал данную вещь");
         }
+
     }
 
     @Override
-    public List<Booking> getAllBooking(String state, int booker) {
+    public List<Booking> getAllBooking(String state, int booker, UserType.Type userType) {
         if (userRepositoryJpa.existsById(booker)) {
-            log.info("Данные о всех бронированиях пользователя с id = {}", booker);
-            return bookingsRepository.getAllBooking(booker, state);
-        } else {
-            log.error("Такого пользователя не существует");
-            throw new ValidationExeption("Такого пользователя не существует");
-        }
-    }
-
-    @Override
-    public List<Booking> getAllBookingOwner(String state, int owner) {
-        if (userRepositoryJpa.existsById(owner)) {
-            log.info("Данные о всех бронированиях всех вещей, владельцем которых является пользователь с id = {}", owner);
-            return bookingsRepository.getAllOwnerBooking(owner, state);
+            if (state.equals("ALL")) {
+                if (userType.equals(UserType.Type.BOOKER)) {
+                    log.info("Данные о всех бронированиях пользователя с id = {}", booker);
+                    return bookingsRepository.getAllBooking(booker, state);
+                }
+                if (userType.equals(UserType.Type.OWNER)) {
+                    log.info("Данные о всех бронированиях всех вещей, владельцем которых является пользователь с id = {}", booker);
+                    return bookingsRepository.getAllOwnerBooking(booker, state);
+                }
+            }
+            if (state.equals("WAITING")) {
+                if (userType == UserType.Type.BOOKER) {
+                    log.info("Данные о бронированиях пользователя с id = {}, ожидающих подтверждения", booker);
+                    return bookingsRepository.getWaitingBooking(booker, state);
+                }
+                if (userType == UserType.Type.OWNER) {
+                    log.info("Данные о всех бронированиях,ожидающих подтверждения, вещей, владельцем которых является пользователь с id = {}", booker);
+                    return bookingsRepository.getWaitingOwnerBooking(booker, state);
+                }
+            }
+            if (state.equals("REJECTED")) {
+                if (userType.equals(UserType.Type.BOOKER)) {
+                    log.info("Данные о бронированиях пользователя с id = {}, отклоненных владельцем вещи", booker);
+                    return bookingsRepository.getRejectedBooking(booker, state);
+                }
+                if (userType.equals(UserType.Type.OWNER)) {
+                    log.info("Данные о всех бронированиях,отклоненных владельцем вещи, вещей, владельцем которых является пользователь с id = {}", booker);
+                    return bookingsRepository.getRejectedOwnerBooking(booker, state);
+                }
+            }
+            if (state.equals("FUTURE")) {
+                if (userType == UserType.Type.BOOKER) {
+                    log.info("Данные о предстоящих бронированиях пользователя с id = {}", booker);
+                    return bookingsRepository.getFutureBooking(booker, state);
+                }
+                if (userType == UserType.Type.OWNER) {
+                    log.info("Данные о всех предстоящих бронированиях вещей, владельцем которых является пользователь с id = {}", booker);
+                    return bookingsRepository.getFutureOwnerBooking(booker, state);
+                }
+            }
+            if (state.equals("CURRENT")) {
+                if (userType.equals(UserType.Type.BOOKER)) {
+                    log.info("Данные о текущих бронированиях пользователя с id = {}", booker);
+                    return bookingsRepository.getCurrentBooking(booker, state);
+                }
+                if (userType.equals(UserType.Type.OWNER)) {
+                    log.info("Данные о всех текущих бронированиях вещей, владельцем которых является пользователь с id = {}", booker);
+                    return bookingsRepository.getCurrentOwnerBooking(booker, state);
+                }
+            }
+            if (state.equals("PAST")) {
+                if (userType.equals(UserType.Type.BOOKER)) {
+                    return bookingsRepository.getPastBooking(booker, state);
+                }
+                if (userType.equals(UserType.Type.OWNER)) {
+                    return bookingsRepository.getPastOwnerBooking(booker, state);
+                }
+            } else {
+                throw new ValidationExeption("Unknown state: UNSUPPORTED_STATUS");
+            }
+            return null;
         } else {
             log.error("Такого пользователя не существует");
             throw new ValidationExeption("Такого пользователя не существует");
@@ -129,4 +183,6 @@ public class BookingServiceImpl implements BookingService {
             }
         }
     }
+
+
 }
