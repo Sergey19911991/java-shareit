@@ -19,56 +19,56 @@ public interface BookingsRepository extends JpaRepository<Booking, Integer> {
             "left join users as u on u.id = b.booker_id " +
             "where b.booker_id = ?1 " +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getAllBooking(int booker, String state);
+    List<Booking> getAllBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
             "left join users as u on u.id = b.booker_id " +
             "where i.owner = ?1 " +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getAllOwnerBooking(int booker, String state);
+    List<Booking> getAllOwnerBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
             "left join users as u on u.id = b.booker_id " +
             "where i.owner = ?1 AND b.status = 'WAITING'" +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getWaitingOwnerBooking(int booker, String state);
+    List<Booking> getWaitingOwnerBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
             "left join users as u on u.id = b.booker_id " +
             "where b.booker_id = ?1 AND b.status = 'WAITING'" +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getWaitingBooking(int booker, String state);
+    List<Booking> getWaitingBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
             "left join users as u on u.id = b.booker_id " +
             "where i.owner = ?1 AND b.status = 'REJECTED'" +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getRejectedOwnerBooking(int booker, String state);
+    List<Booking> getRejectedOwnerBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
             "left join users as u on u.id = b.booker_id " +
             "where b.booker_id = ?1 AND b.status = 'REJECTED'" +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getRejectedBooking(int booker, String state);
+    List<Booking> getRejectedBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
             "left join users as u on u.id = b.booker_id " +
             "where i.owner = ?1 AND b.start_date>NOW()" +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getFutureOwnerBooking(int booker, String state);
+    List<Booking> getFutureOwnerBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
             "left join users as u on u.id = b.booker_id " +
             "where b.booker_id = ?1 AND b.start_date>NOW()" +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getFutureBooking(int booker, String state);
+    List<Booking> getFutureBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
@@ -88,26 +88,41 @@ public interface BookingsRepository extends JpaRepository<Booking, Integer> {
             "left join users as u on u.id = b.booker_id " +
             "where b.booker_id = ?1 AND b.start_date<NOW() AND b.end_date>NOW()" +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getCurrentBooking(int booker, String state);
+    List<Booking> getCurrentBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
             "left join users as u on u.id = b.booker_id " +
             "where i.owner = ?1 AND b.start_date<NOW() AND b.end_date>NOW()" +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getCurrentOwnerBooking(int booker, String state);
+    List<Booking> getCurrentOwnerBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
             "left join users as u on u.id = b.booker_id " +
             "where b.booker_id = ?1 AND b.end_date<NOW()" +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getPastBooking(int booker, String state);
+    List<Booking> getPastBooking(int booker);
 
     @Query(value = "select * " +
             "from bookings as b left join items as i on i.id = b.item_id " +
             "left join users as u on u.id = b.booker_id " +
             "where i.owner = ?1 AND b.end_date<NOW()" +
             "order by b.start_date DESC ", nativeQuery = true)
-    List<Booking> getPastOwnerBooking(int booker, String state);
+    List<Booking> getPastOwnerBooking(int booker);
+
+
+    @Query(value = "select * " +
+            "from bookings as b left join items as i on i.id = b.item_id " +
+            "left join users as u on u.id = b.booker_id " +
+            "where b.booker_id = ?1 " +
+            "order by b.start_date DESC OFFSET ?2 ROWS FETCH NEXT ?3 ROWS ONLY", nativeQuery = true)
+    List<Booking> getAllBookingPagination(int booker, int from, int size);
+
+    @Query(value = "select * " +
+            "from bookings as b left join items as i on i.id = b.item_id " +
+            "left join users as u on u.id = b.booker_id " +
+            "where i.owner = ?1 " +
+            "order by b.start_date DESC OFFSET ?2 ROWS FETCH NEXT ?3 ROWS ONLY", nativeQuery = true)
+    List<Booking> getAllOwnerBookingPagination(int booker, int from, int size);
 }

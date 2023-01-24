@@ -11,6 +11,8 @@ import ru.practicum.shareit.exeption.RequestException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comments;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.RequestRepository;
 import ru.practicum.shareit.user.UserRepositoryJpa;
 
 import java.time.LocalDateTime;
@@ -32,14 +34,24 @@ public class ItemServiceImpl implements ItemService {
     private final MappingNextBooking mappingNextBooking;
 
     private final MappingLastBooking mappingLastBooking;
+    private final MappingItemDtoOutletInlet mappingItemDtoOutletInlet;
+
+    private final RequestRepository requestRepository;
 
     @Override
-    public Item creatItem(int id, Item item) {
+    public ItemDtoInletOutlet creatItem(int id, ItemDtoInletOutlet itemDtoInletOutlet) {
+        Item item = mappingItemDtoOutletInlet.mapping(itemDtoInletOutlet);
+        if (itemDtoInletOutlet.getRequestId() != null) {
+            int i = Integer.parseInt((String.valueOf(itemDtoInletOutlet.getRequestId())));
+            ItemRequest itemRequest = requestRepository.findById(i).get();
+            item.setRequest(itemRequest);
+        }
         validationItem(item);
         if (userRepositoryJpa.existsById(id)) {
             item.setOwner(id);
             log.info("Создана вещь");
-            return itemRepositoryJpa.save(item);
+            itemDtoInletOutlet.setId(itemRepositoryJpa.save(item).getId());
+            return itemDtoInletOutlet;
         } else {
             log.error("Такой пользователь не найден");
             throw new NotFoundException("Такой пользователь не найден!");
@@ -169,6 +181,7 @@ public class ItemServiceImpl implements ItemService {
             log.error("Описание вещи не может быть пустым");
             throw new RequestException("Описание вещи не может быть пустым");
         }
+
     }
 
     public CommentDto createComment(Comments comment, int booker, int itemId) {

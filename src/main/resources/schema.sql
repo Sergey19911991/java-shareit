@@ -1,6 +1,8 @@
+
 drop table if exists comments;
 drop table if exists bookings;
 Drop Table if exists items;
+drop table if exists requests;
 DROP TABLE IF EXISTS users;
 
 
@@ -12,18 +14,31 @@ CREATE TABLE IF NOT EXISTS users (
     CONSTRAINT UQ_USER_EMAIL UNIQUE (email)
     );
 
-create table IF NOT EXISTS items
+create table if not exists requests
+(
+    id           serial
+        constraint requests_pk
+            primary key
+        unique,
+    description  varchar,
+    created      timestamp,
+    requestor_id integer
+        constraint requests_users_id_fk
+            references users
+);
+
+create table if not exists items
 (
     id          serial
         constraint items_pk
-            primary key
-        unique,
+            primary key,
     name        varchar,
     description varchar not null,
     available   boolean not null,
     owner       integer
         constraint items_users_id_fk
-            references users
+            references users,
+    request_id  integer
 );
 
 create table if not exists bookings
@@ -58,3 +73,4 @@ create table if not exists comments
             references users,
     created   timestamp
 );
+

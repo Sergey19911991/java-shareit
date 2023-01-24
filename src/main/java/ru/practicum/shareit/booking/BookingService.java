@@ -13,6 +13,6 @@ public interface BookingService {
 
     Booking updateBookingRej(int bookingId, int booker);
 
-    List<Booking> getAllBooking(String state, int booker, UserType.Type userType);
+    List<Booking> getAllBooking(String state, int booker, UserType.Type userType, Integer from, Integer size);
 
 }
