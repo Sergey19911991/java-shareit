@@ -12,7 +12,7 @@ import ru.practicum.shareit.exeption.ValidationExeption;
 @ControllerAdvice
 public class ErrorHandlerTest {
     private ErrorHandler errorHandler = new ErrorHandler();
-
+    //
 
     @ExceptionHandler(value
             = {NotFoundException.class})
