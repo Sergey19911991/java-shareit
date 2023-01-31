@@ -168,7 +168,7 @@ public class ItemServiceImpl implements ItemService {
         return itemsList;
     }
 
-    private void validationItem(Item item) {
+    public void validationItem(Item item) {
         if (item.getAvailable() == null) {
             log.error("Статус не может отсутствовать");
             throw new RequestException("Статус не может отсутствовать");
@@ -207,6 +207,7 @@ public class ItemServiceImpl implements ItemService {
             throw new RequestException("Данный пользователь не бронировал данную вещь");
         }
     }
+
 
 
 }

@@ -74,7 +74,7 @@ public class UserService {
         return userRepositoryJpa.findAll();
     }
 
-    private void validationUserEmail(User user) {
+    public void validationUserEmail(User user) {
         if (user.getEmail() == null) {
             log.error("Пользователь не создан. У пользователя нет email.");
             throw new RequestException("У пользователя должен быть email!");

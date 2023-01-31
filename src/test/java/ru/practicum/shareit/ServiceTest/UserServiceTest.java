@@ -6,6 +6,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.shareit.exeption.NotFoundException;
+import ru.practicum.shareit.exeption.RequestException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepositoryJpa;
 import ru.practicum.shareit.user.UserService;
@@ -54,12 +56,43 @@ public class UserServiceTest {
         Assertions.assertEquals(user, userService.creatUser(user));
     }
 
+    @Test
+    public void createUserEmailNull() {
+        user.setEmail(null);
+
+        Assertions.assertThrows(RequestException.class, () -> {
+            userService.creatUser(user);
+        });
+    }
+
+    @Test
+    public void createUserEmail() {
+        user.setEmail("email");
+
+        Assertions.assertThrows(RequestException.class, () -> {
+            userService.creatUser(user);
+        });
+    }
+
 
     @Test
     public void getUser() {
         when(userRepositoryJpa.findById(1)).thenReturn(Optional.of(user));
 
         Assertions.assertEquals(user, userService.getUser(1));
+    }
+
+
+    @Test
+    public void getUserNull() {
+        User user1 = new User();
+        user1 = null;
+
+        when(userRepositoryJpa.findById(1)).thenReturn(Optional.ofNullable(user1));
+
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            userService.getUser(1);
+        });
     }
 
     @Test
@@ -93,5 +126,57 @@ public class UserServiceTest {
         verify(userRepositoryJpa).deleteById(anyInt());
     }
 
+    @Test
+    public void deleteUserNull() {
+        when(userRepositoryJpa.existsById(anyInt())).thenReturn(false);
+
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            userService.deleteUser(anyInt());
+            ;
+        });
+    }
+
+    @Test
+    public void updateError() {
+        when(userRepositoryJpa.existsById(anyInt())).thenReturn(false);
+
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            userService.updateUser(user, 1);
+        });
+    }
+
+    @Test
+    public void updateEmailNull() {
+        User user1 = new User();
+        user1.setName("NameName");
+
+        when(userRepositoryJpa.findById(anyInt())).thenReturn(Optional.of(user));
+        when(userRepositoryJpa.existsById(anyInt())).thenReturn(true);
+        User user2 = userService.updateUser(user1, 1);
+        verify(userRepositoryJpa).save(userArgumentCaptor.capture());
+        User saved = userArgumentCaptor.getValue();
+
+        assertEquals("NameName", saved.getName());
+        assertEquals("email@email.ru", saved.getEmail());
+
+    }
+
+    @Test
+    public void validationUser() {
+        user.setEmail(null);
+
+        Assertions.assertThrows(RequestException.class, () -> {
+            userService.validationUserEmail(user);
+        });
+    }
+
+    @Test
+    public void validationEmail() {
+        user.setEmail("email");
+
+        Assertions.assertThrows(RequestException.class, () -> {
+            userService.validationUserEmail(user);
+        });
+    }
 
 }

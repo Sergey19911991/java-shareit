@@ -79,7 +79,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking getBooking(int bookingId, int bookerId) {
         Booking booking = bookingsRepository.findById(bookingId).orElse(null);
-        ;
         if (booking != null && userRepositoryJpa.existsById(bookerId) && (booking.booker.getId() == bookerId || booking.item.getOwner() == bookerId)) {
             log.info("Данные о бронировании с id = {}", bookingId);
             return bookingsRepository.getBooking(bookingId, bookerId);
@@ -175,7 +174,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private void validationBooking(Booking booking) {
+    public void validationBooking(Booking booking) {
         if (!itemRepositoryJpa.existsById(booking.item.getId())) {
             log.error("Вещи с таким id не существует");
             throw new NotFoundException("Вещи с таким id не существует");
@@ -191,10 +190,6 @@ public class BookingServiceImpl implements BookingService {
             if (booking.getStart().isBefore(LocalDateTime.now())) {
                 log.error("Начало бронирования не может быть раньше настоящего момента времени");
                 throw new RequestException("Начало бронирования не может быть раньше настоящего момента времени");
-            }
-            if (booking.getEnd().isBefore(LocalDateTime.now())) {
-                log.error("Окончание бронирования не может быть раньше настоящего момента времени");
-                throw new RequestException("Окончание бронирования не может быть раньше настоящего момента времени");
             }
         }
     }

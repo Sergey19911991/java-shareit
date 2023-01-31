@@ -11,6 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.practicum.shareit.ErrorHandlerTest;
+import ru.practicum.shareit.exeption.NotFoundException;
+import ru.practicum.shareit.exeption.RequestException;
+import ru.practicum.shareit.exeption.ValidationExeption;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.UserService;
@@ -33,16 +37,21 @@ public class UserControllerTest {
     @InjectMocks
     private UserController controller;
 
+
+
     private final ObjectMapper mapper = new ObjectMapper();
     private MockMvc mvc;
 
     private User user;
 
+    @InjectMocks
+    private ErrorHandlerTest errorHandlerTest;
 
     @BeforeEach
     void setUp() {
         mvc = MockMvcBuilders
                 .standaloneSetup(controller)
+                .setControllerAdvice(errorHandlerTest)
                 .build();
         user = new User();
         user.setId(1);
@@ -118,5 +127,29 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
     }
 
+
+   @Test
+    void getUserError() throws Exception {
+        when(userService.getUser(100)).thenThrow(new NotFoundException("Ошибка"));
+
+        mvc.perform(get("/users/{userId}", 100))
+                .andExpect(status().is(404));
+    }
+
+    @Test
+    void getUserError1() throws Exception {
+        when(userService.getUser(100)).thenThrow(new ValidationExeption("Ошибка"));
+
+        mvc.perform(get("/users/{userId}", 100))
+                .andExpect(status().is(500));
+    }
+
+    @Test
+    void getUserError2() throws Exception {
+        when(userService.getUser(100)).thenThrow(new RequestException("Ошибка"));
+
+        mvc.perform(get("/users/{userId}", 100))
+                .andExpect(status().is(400));
+    }
 
 }
