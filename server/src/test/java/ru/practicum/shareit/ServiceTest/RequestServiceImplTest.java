@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.RequestException;
 import ru.practicum.shareit.item.ItemRepositoryJpa;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
