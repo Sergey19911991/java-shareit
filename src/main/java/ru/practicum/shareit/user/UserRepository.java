@@ -46,14 +46,6 @@ public class UserRepository {
         users.remove(id);
     }
 
-    public List<User> getAllUser() {
-        log.info("Выведены данные о всех пользователях");
-        List<User> usersList = new ArrayList<>();
-        usersList.addAll(users.values());
-        return usersList;
-    }
-
-
     private void validationUserEmail(User user) {
         if (user.getEmail() == null) {
             log.error("Пользователь не создан. У пользователя нет email.");

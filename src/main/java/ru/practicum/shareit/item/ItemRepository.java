@@ -65,7 +65,7 @@ public class ItemRepository {
     }
 
     public ItemDto getItemById(int id, int idUser) {
-        log.error("Пользователю {} выведена информация о вещи с id = {}",idUser, id);
+        log.error("Пользователю {} выведена информация о вещи с id = {}", idUser, id);
         return mappingItem.mapItemDto(items.get(id));
     }
 
@@ -80,8 +80,8 @@ public class ItemRepository {
         return itemsList;
     }
 
-    public List<ItemDto> getSearch(String text,int idUser) {
-        log.error("Пользователю {} выведена информация о вещах, содержащих в названии и/или в описании текст {}",idUser, text);
+    public List<ItemDto> getSearch(String text, int idUser) {
+        log.error("Пользователю {} выведена информация о вещах, содержащих в названии и/или в описании текст {}", idUser, text);
         List<ItemDto> itemsList = new ArrayList<>();
         if (!text.isEmpty()) {
             for (Item itemId : items.values()) {

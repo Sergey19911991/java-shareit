@@ -4,6 +4,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.Set;
 
 
 public interface ItemService {
@@ -14,7 +15,7 @@ public interface ItemService {
 
     ItemDto getItemById(int id, int idUser);
 
-    List<ItemDto> getItemAll(int idUser);
+    Set<ItemDto> getItemAll(int idUser);
 
-    List<ItemDto> getSearch(String text,int idUser);
+    List<ItemDto> getSearch(String text, int idUser);
 }
