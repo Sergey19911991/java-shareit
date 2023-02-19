@@ -79,7 +79,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking getBooking(int bookingId, int bookerId) {
         Booking booking = bookingsRepository.findById(bookingId).orElse(null);
-        ;
         if (booking != null && userRepositoryJpa.existsById(bookerId) && (booking.booker.getId() == bookerId || booking.item.getOwner() == bookerId)) {
             log.info("Данные о бронировании с id = {}", bookingId);
             return bookingsRepository.getBooking(bookingId, bookerId);
@@ -91,64 +90,79 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllBooking(String state, int booker, UserType.Type userType) {
+    public List<Booking> getAllBooking(String state, int booker, UserType.Type userType, Integer from, Integer size) {
         if (userRepositoryJpa.existsById(booker)) {
             if (state.equals("ALL")) {
-                if (userType.equals(UserType.Type.BOOKER)) {
-                    log.info("Данные о всех бронированиях пользователя с id = {}", booker);
-                    return bookingsRepository.getAllBooking(booker, state);
+                if (from == null && size == null) {
+                    if (userType.equals(UserType.Type.BOOKER)) {
+                        log.info("Данные о всех бронированиях пользователя с id = {}", booker);
+                        return bookingsRepository.getAllBooking(booker);
+                    }
+                    if (userType.equals(UserType.Type.OWNER)) {
+                        log.info("Данные о всех бронированиях всех вещей, владельцем которых является пользователь с id = {}", booker);
+                        return bookingsRepository.getAllOwnerBooking(booker);
+                    }
                 }
-                if (userType.equals(UserType.Type.OWNER)) {
-                    log.info("Данные о всех бронированиях всех вещей, владельцем которых является пользователь с id = {}", booker);
-                    return bookingsRepository.getAllOwnerBooking(booker, state);
+                if (size != null && from != null && size > 0 && from >= 0) {
+                    if (userType.equals(UserType.Type.BOOKER)) {
+                        log.info("Данные о всех бронированиях пользователя с id = {}", booker);
+                        return bookingsRepository.getAllBookingPagination(booker, from, size);
+                    }
+                    if (userType.equals(UserType.Type.OWNER)) {
+                        log.info("Данные о всех бронированиях всех вещей, владельцем которых является пользователь с id = {}", booker);
+                        return bookingsRepository.getAllOwnerBookingPagination(booker, from, size);
+                    }
+                } else {
+                    log.error("Длина списка не может быть меньше нуля или равна нулю");
+                    throw new RequestException("Длина списка не может быть меньше нуля или равна нулю");
                 }
             }
             if (state.equals("WAITING")) {
                 if (userType == UserType.Type.BOOKER) {
                     log.info("Данные о бронированиях пользователя с id = {}, ожидающих подтверждения", booker);
-                    return bookingsRepository.getWaitingBooking(booker, state);
+                    return bookingsRepository.getWaitingBooking(booker);
                 }
                 if (userType == UserType.Type.OWNER) {
                     log.info("Данные о всех бронированиях,ожидающих подтверждения, вещей, владельцем которых является пользователь с id = {}", booker);
-                    return bookingsRepository.getWaitingOwnerBooking(booker, state);
+                    return bookingsRepository.getWaitingOwnerBooking(booker);
                 }
             }
             if (state.equals("REJECTED")) {
                 if (userType.equals(UserType.Type.BOOKER)) {
                     log.info("Данные о бронированиях пользователя с id = {}, отклоненных владельцем вещи", booker);
-                    return bookingsRepository.getRejectedBooking(booker, state);
+                    return bookingsRepository.getRejectedBooking(booker);
                 }
                 if (userType.equals(UserType.Type.OWNER)) {
                     log.info("Данные о всех бронированиях,отклоненных владельцем вещи, вещей, владельцем которых является пользователь с id = {}", booker);
-                    return bookingsRepository.getRejectedOwnerBooking(booker, state);
+                    return bookingsRepository.getRejectedOwnerBooking(booker);
                 }
             }
             if (state.equals("FUTURE")) {
                 if (userType == UserType.Type.BOOKER) {
                     log.info("Данные о предстоящих бронированиях пользователя с id = {}", booker);
-                    return bookingsRepository.getFutureBooking(booker, state);
+                    return bookingsRepository.getFutureBooking(booker);
                 }
                 if (userType == UserType.Type.OWNER) {
                     log.info("Данные о всех предстоящих бронированиях вещей, владельцем которых является пользователь с id = {}", booker);
-                    return bookingsRepository.getFutureOwnerBooking(booker, state);
+                    return bookingsRepository.getFutureOwnerBooking(booker);
                 }
             }
             if (state.equals("CURRENT")) {
                 if (userType.equals(UserType.Type.BOOKER)) {
                     log.info("Данные о текущих бронированиях пользователя с id = {}", booker);
-                    return bookingsRepository.getCurrentBooking(booker, state);
+                    return bookingsRepository.getCurrentBooking(booker);
                 }
                 if (userType.equals(UserType.Type.OWNER)) {
                     log.info("Данные о всех текущих бронированиях вещей, владельцем которых является пользователь с id = {}", booker);
-                    return bookingsRepository.getCurrentOwnerBooking(booker, state);
+                    return bookingsRepository.getCurrentOwnerBooking(booker);
                 }
             }
             if (state.equals("PAST")) {
                 if (userType.equals(UserType.Type.BOOKER)) {
-                    return bookingsRepository.getPastBooking(booker, state);
+                    return bookingsRepository.getPastBooking(booker);
                 }
                 if (userType.equals(UserType.Type.OWNER)) {
-                    return bookingsRepository.getPastOwnerBooking(booker, state);
+                    return bookingsRepository.getPastOwnerBooking(booker);
                 }
             } else {
                 throw new ValidationExeption("Unknown state: UNSUPPORTED_STATUS");
@@ -160,7 +174,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private void validationBooking(Booking booking) {
+    public void validationBooking(Booking booking) {
         if (!itemRepositoryJpa.existsById(booking.item.getId())) {
             log.error("Вещи с таким id не существует");
             throw new NotFoundException("Вещи с таким id не существует");
@@ -176,10 +190,6 @@ public class BookingServiceImpl implements BookingService {
             if (booking.getStart().isBefore(LocalDateTime.now())) {
                 log.error("Начало бронирования не может быть раньше настоящего момента времени");
                 throw new RequestException("Начало бронирования не может быть раньше настоящего момента времени");
-            }
-            if (booking.getEnd().isBefore(LocalDateTime.now())) {
-                log.error("Окончание бронирования не может быть раньше настоящего момента времени");
-                throw new RequestException("Окончание бронирования не может быть раньше настоящего момента времени");
             }
         }
     }

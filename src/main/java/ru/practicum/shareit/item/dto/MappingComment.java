@@ -1,8 +1,10 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.model.Comments;
 
+@RequiredArgsConstructor
 @Service
 public class MappingComment {
 

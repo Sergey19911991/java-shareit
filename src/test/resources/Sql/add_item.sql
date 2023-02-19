@@ -1,0 +1,1 @@
+insert into items (id, name, description,available,owner,request_id) values (1,'Item','Item',true,1,1);

@@ -14,6 +14,7 @@ import java.util.List;
 public class UserService {
     private final UserRepositoryJpa userRepositoryJpa;
 
+
     public User creatUser(User user) {
         if (user.getEmail() == null) {
             log.error("Пользователь не создан. У пользователя нет email.");
@@ -48,7 +49,8 @@ public class UserService {
     }
 
     public User getUser(int id) {
-        if (userRepositoryJpa.existsById(id)) {
+        User user = userRepositoryJpa.findById(id).orElse(null);
+        if (user != null) {
             return userRepositoryJpa.findById(id).get();
         } else {
             log.error("Такой пользователь не найден");
@@ -60,7 +62,7 @@ public class UserService {
 
     public void deleteUser(int id) {
         if (userRepositoryJpa.existsById(id)) {
-            log.info("Удален пользователь с id = {}",id);
+            log.info("Удален пользователь с id = {}", id);
             userRepositoryJpa.deleteById(id);
         } else {
             log.error("Пользователь с таким id не найден");
@@ -72,7 +74,7 @@ public class UserService {
         return userRepositoryJpa.findAll();
     }
 
-    private void validationUserEmail(User user) {
+    public void validationUserEmail(User user) {
         if (user.getEmail() == null) {
             log.error("Пользователь не создан. У пользователя нет email.");
             throw new RequestException("У пользователя должен быть email!");
