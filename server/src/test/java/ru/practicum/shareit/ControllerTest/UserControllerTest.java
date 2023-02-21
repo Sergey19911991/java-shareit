@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.ErrorHandlerTest;
+import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.RequestException;
 import ru.practicum.shareit.exception.ValidationExeption;
@@ -149,6 +150,14 @@ public class UserControllerTest {
 
         mvc.perform(get("/users/{userId}", 100))
                 .andExpect(status().is(400));
+    }
+
+    @Test
+    void getUserError3() throws Exception {
+        when(userService.getUser(100)).thenThrow(new ConflictException("Ошибка"));
+
+        mvc.perform(get("/users/{userId}", 100))
+                .andExpect(status().is(409));
     }
 
 }

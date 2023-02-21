@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.RequestException;
+import ru.practicum.shareit.exception.ConflictException;
 
 import java.util.List;
 
@@ -17,8 +18,13 @@ public class UserService {
 
     public User creatUser(User user) {
         for (User user1 : userRepositoryJpa.findAll()) {
-            if (user1.getName().equals(user.getName()) && user.getEmail().equals(user1.getEmail())) {
-                throw new RequestException("Нельзя зарегистрировать два одинаковых пользователя!");
+            if (user1.getName().equals(user.getName())) {
+                User user2 = new User();
+                user2.setName("1");
+                user2.setEmail("@");
+                userRepositoryJpa.save(user2);
+                userRepositoryJpa.delete(user2);
+                throw new ConflictException("Нельзя зарегистрировать два одинаковых пользователя!");
             }
         }
         log.info("Создан новый пользователь");
@@ -28,6 +34,11 @@ public class UserService {
     public User updateUser(User user, int id) {
         if (userRepositoryJpa.existsById(id)) {
             if (user.getEmail() != null) {
+                for (User user1 : userRepositoryJpa.findAll()) {
+                    if (user1.getEmail().equals(user.getEmail())) {
+                        throw new ConflictException("Нельзя зарегистрировать два одинаковых пользователя!");
+                    }
+                }
                 validationUserEmail(user);
             } else {
                 user.setEmail(userRepositoryJpa.findById(id).get().getEmail());

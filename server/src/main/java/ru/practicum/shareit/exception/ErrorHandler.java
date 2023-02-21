@@ -33,4 +33,12 @@ public class ErrorHandler {
         );
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleConflictException(final ConflictException e) {
+        return Map.of("error", "Ошибка",
+                "errorMessage", e.getMessage()
+        );
+    }
+
 }

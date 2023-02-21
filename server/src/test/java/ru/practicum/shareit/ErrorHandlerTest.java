@@ -8,11 +8,12 @@ import ru.practicum.shareit.exception.ErrorHandler;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.RequestException;
 import ru.practicum.shareit.exception.ValidationExeption;
+import ru.practicum.shareit.exception.ConflictException;
 
 @ControllerAdvice
 public class ErrorHandlerTest {
     private ErrorHandler errorHandler = new ErrorHandler();
-    //
+
 
     @ExceptionHandler(value
             = {NotFoundException.class})
@@ -30,5 +31,11 @@ public class ErrorHandlerTest {
             = {RequestException.class})
     public ResponseEntity<Object> handleRequest(RequestException e) {
         return new ResponseEntity<>(errorHandler.handleRequestException(e), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value
+            = {ConflictException.class})
+    public ResponseEntity<Object> handleRequest(ConflictException e) {
+        return new ResponseEntity<>(errorHandler.handleConflictException(e), HttpStatus.CONFLICT);
     }
 }
