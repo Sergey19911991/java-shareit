@@ -16,6 +16,11 @@ public class UserService {
 
 
     public User creatUser(User user) {
+        for (User user1 : userRepositoryJpa.findAll()) {
+            if (user1.getName().equals(user.getName()) && user.getEmail().equals(user1.getEmail())) {
+                throw new RequestException("Нельзя зарегистрировать два одинаковых пользователя!");
+            }
+        }
         log.info("Создан новый пользователь");
         return userRepositoryJpa.save(user);
     }
